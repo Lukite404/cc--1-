@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Heart Disease Predictor</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <script src="https://kit.fontawesome.com/1f8a11c091.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="card">
+            <img src="/static/img/img1.jpg" alt="Heart Background">
+            <div class="info">
+                <h1>About</h1>
+                <p>This project utilizes a comprehensive set of patient data 
+                    to accurately identify the presence of heart disease.
+                </p>
+                <a href="https://colab.research.google.com/drive/1WEMeCLyPiU-PWSWN0bb6phEye40vNg42?fbclid=IwAR2PFfjw7ApZHd9TT8v9dbZuaDj3IoSH0TVLETJmPcJ_lvH5_VuGwGfaFWc#scrollTo=VgF-zcdOVxb9" class="btn">Read Notebook</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <form class="form-group" action="/" method="POST">
+            <div class="details">
+                <div class="input-group">
+                    <label for="age"><i class="fa-solid fa-hospital-user"></i> Age</label>
+                    <input type="text" name="age" placeholder="Enter age(years)" required>
+                </div>
+                <div class="input-group">
+                    <label for="sex"><i class="fa-solid fa-person-half-dress"></i> Sex</label>
+                    <input type="text" name="sex" placeholder="Enter your sex (Male, Female)" required>
+                </div>
+                <div class="input-group">
+                    <label for="maxhr"><i class="fa-solid fa-heart-circle-plus"></i> Maximum Heart Rate</label>
+                    <input type="text" name="maxhr" placeholder="Enter maximum HR:(between 60 & 202)" required>
+                </div>
+                <div class="input-group">
+                    <label for="ecg"><i class="fa-solid fa-pager"></i> Resting Electrocardiogram</label>
+                    <input type="text" name="ecg" placeholder="Enter resting ECG: (Normal,ST,LVH)" required>
+                </div>
+                <div class="input-group">
+                    <label for="stslope"><i class="fa-solid fa-heart-pulse"></i> ST Slope</label>
+                    <input type="text" name="stslope" placeholder="Enter ST slope:(Up,Flat,Down)" required>
+                </div>
+                <div class="input-group">
+                    <label for="cholesterol"><i class="fa-solid fa-fire-flame-simple"></i> Cholesterol</label>
+                    <input type="text" name="cholesterol" placeholder="Enter cholesterol:(mm/dl)" required>
+                </div>
+                <div class="input-group">
+                    <label for="restingbp"><i class="fa-solid fa-person-half-dress"></i> Resting Blood Pressure</label>
+                    <input type="text" name="restingbp" placeholder="Enter resting BP:(mm/Hg)" required>
+                </div>
+                <div class="input-group">
+                    <label for="oldpeak"><i class="fa-solid fa-file-waveform"></i> Old Peak</label>
+                    <input type="text" name="oldpeak" placeholder="Enter old peak:(numeric value)" required>
+                </div>
+                <div class="input-group">
+                    <label for="chestpaintype"><i class="fa-solid fa-lungs"></i> Chest Pain Type</label>
+                    <input type="text" name="chestpaintype" placeholder="Enter pain type:(TA,ATA,NAP,ASY)" required>
+                </div>
+                <div class="input-group">
+                    <label for="exerciseangina"><i class="fa-solid fa-heart-circle-bolt"></i> Exercise-induced Angina</label>
+                    <input type="text" name="exerciseangina" placeholder="Enter exercise angina:(Yes,No)" required>
+                </div>
+                <div class="input-group">
+                    <label for="fastingbs"><i class="fa-solid fa-droplet"></i> Fasting Blood Sugar </label>
+                    <input type="text" name="fastingbs" placeholder="Enter fbs:(1:if>120 mg/dl,0:otherwise)" required>
+                </div>
+            </div>
+            <button type="submit">PREDICT</button>
+        </form>
+        <div class="prediction-result" id="prediction-result">
+            {% if result %}
+                <div class="result-box">
+                    <p class="result-text">{{ result }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Lato', sans-serif;
+        }
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url("/static/img/img3.jpg") no-repeat center center fixed;
+            background-size: cover;
+            padding: 10px;
+        }
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .card {
+            width: 280px;
+            height: 360px;
+            padding: 2rem 1rem;
+            background: #fff;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            box-shadow: 0px 7px 10px rgba(0,0,0,0.5);
+            transition: transform 0.5s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+        }
+        .card:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,176,155,0.5), rgba(150,201,61,1));
+            z-index: 2;
+            transition: opacity 0.5s;
+            opacity: 0;
+        }
+        .card:hover:before {
+            opacity: 1;
+        }
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 92% 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .card .info {
+            position: relative;
+            z-index: 3;
+            color: #fff;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s;
+        }
+        .card:hover .info {
+            opacity: 1;
+            transform: translateY(0px);
+        }
+        .card .info h1 {
+            margin: 0;
+        }
+        .card .info p {
+            letter-spacing: 1px;
+            font-size: 15px;
+            margin-top: 8px;
+            margin-bottom: 20px;
+        }
+        .card .info .btn {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            background: #fff;
+            color: #000;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.4s ease-in-out;
+        }
+        .card .info .btn:hover {
+            box-shadow: 0px 7px 10px rgba(0,0,0,0.5);
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: linear-gradient(rgba(0,0,0,0.7), #3531b5), url("/static/img/img2.jpg");
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 20px 30px 25px rgba(0,0,0,0.15);
+        }
+        form {
+            width: 100%;
+            color: #fff;
+        }
+        .details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .input-group {
+            width: 48%;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            outline: 0;
+            border: 1px solid #fff;
+            color: #fff;
+            background: transparent;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 0;
+            color: #fff;
+            outline: none;
+            background: #3531b5;
+            border: 1px solid #fff;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #444;
+        }
+        .prediction-result {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .result-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .result-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #343a40;
+            margin: 0;
+        }
+    </style>
+</body>
+</html>
